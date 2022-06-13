@@ -19,9 +19,13 @@ mongoose.connection.once("open", () => {
   console.log("connected to mongo");
 });
 //? middleware
+
 app.use(express.urlencoded({ extended: true }));
-// app.use("/fruits", fruitsController);
-// app.use("/users", userController);
+app.get("/", (req, res) => {
+  res.send("hello world");
+});
+app.use("/fruits", fruitsController);
+app.use("/users", userController);
 // app.use("/sessions", sessionsController);
 // app.use(
 //   session({
@@ -30,9 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 //     saveUninitialized: false, // default  more info: https://www.npmjs.com/package/express-session#resave
 //   })
 // );
-app.get("/", (req, res) => {
-  res.send("hello world");
-});
+
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
