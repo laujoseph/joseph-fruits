@@ -10,9 +10,13 @@ const session = require("express-session");
 
 const app = express();
 const PORT = process.env.PORT | 5001;
-const mongodbURI = process.env.MONGODB_URI;
+const mongodbURI =
+  process.env.MONGODB_URI ||
+  "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false";
 
-mongoose.connect("mongodb://127.0.0.1:27017/basiccrud");
+mongoose.connect(
+  "mongodb+srv://josephlau:Pigupeach123!@subapp.ufegr.mongodb.net/?retryWrites=true&w=majority"
+);
 mongoose.connection.once("open", () => {
   console.log("connected to mongo");
 });
@@ -28,7 +32,9 @@ app.use(
     saveUninitialized: false, // default  more info: https://www.npmjs.com/package/express-session#resave
   })
 );
-
+app.get("/", () => {
+  res.send("hello world");
+});
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);
 });
