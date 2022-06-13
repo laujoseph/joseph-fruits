@@ -1,31 +1,66 @@
-const bcrypt = require("bcrypt");
-const express = require("express");
-const users = express.Router();
-const User = require("../models/users.js");
+//? seed - /users/seed
 
-users.get("/new", async (req, res) => {
-  //   res.render("users/new.ejs");
+//? post - /users (login)
+
+//? Dependencies
+const express = require("express");
+const bcrypt = require("bcrypt");
+const User = require("../models/users");
+
+//? Config
+const router = express.Router();
+const saltRounds = bcrypt.genSaltSync(10);
+
+//? Routes
+//? Seed  Routes
+router.get("/seed", async (req, res) => {
   try {
-    const users = await User.find();
-    res.send(users);
+    await User.deleteMany({});
+    const newUsers = await User.create([
+      {
+        name: "simon",
+        password: bcrypt.hashSync("123", saltRounds),
+      },
+    ]);
+    res.send(newUsers);
   } catch (error) {
     res.send(error);
   }
 });
 
-users.post("/", async (req, res) => {
-  //overwrite the user password with the hashed password, then pass that in to our database
-  req.body.password = bcrypt.hashSync(
-    req.body.password,
-    bcrypt.genSaltSync(10)
-  );
-  try {
-    const createdUser = await User.create(req.body);
-    console.log("created user is: ", createdUser);
-    res.redirect("/");
-  } catch (error) {
-    console.log(error);
+//? hashed password (1 way) - fast
+//? maths function -> input -> same output
+//? no collision -> diff input -> same output
+
+//? encryption <-> decryption (2 way) - slow
+
+router.post("/", async (req, res) => {
+  const { name, password } = req.body;
+  const user = await User.findOne({ name });
+  if (user === null) {
+    res.send("Login fail");
+  } else if (bcrypt.compareSync(password, user.password)) {
+    //? create the session (AAA) and set user key & value
+    //? also set the cookie (middleware) - AAA
+    req.session.user = user;
+    // console.log("session", req.session)
+    res.send(user);
+  } else {
+    res.send("Password fail");
   }
 });
 
-module.exports = users;
+const isAuthenticated = (req, res, next) => {
+  if (req.session.user) {
+    return next();
+  } else {
+    res.send("Login fail");
+  }
+};
+
+//? cookie - AAA -> middleware -> req.session
+router.get("/secret", isAuthenticated, async (req, res) => {
+  res.send(req.session.user);
+});
+
+module.exports = router;
