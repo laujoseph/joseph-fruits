@@ -10,9 +10,7 @@ const session = require("express-session");
 
 const app = express();
 const PORT = process.env.PORT | 5001;
-const mongodbURI =
-  process.env.MONGODB_URI ||
-  "mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false";
+const mongodbURI = process.env.MONGODB_URI || "mongodb://localhost:27017";
 
 mongoose.connect(
   "mongodb+srv://josephlau:Pigupeach123!@subapp.ufegr.mongodb.net/?retryWrites=true&w=majority"
@@ -22,16 +20,16 @@ mongoose.connection.once("open", () => {
 });
 //? middleware
 app.use(express.urlencoded({ extended: true }));
-app.use("/fruits", fruitsController);
-app.use("/users", userController);
-app.use("/sessions", sessionsController);
-app.use(
-  session({
-    secret: process.env.SECRET, //a random string do not copy this value or your stuff will get hacked
-    resave: false, // default more info: https://www.npmjs.com/package/express-session#resave
-    saveUninitialized: false, // default  more info: https://www.npmjs.com/package/express-session#resave
-  })
-);
+// app.use("/fruits", fruitsController);
+// app.use("/users", userController);
+// app.use("/sessions", sessionsController);
+// app.use(
+//   session({
+//     secret: process.env.SECRET, //a random string do not copy this value or your stuff will get hacked
+//     resave: false, // default more info: https://www.npmjs.com/package/express-session#resave
+//     saveUninitialized: false, // default  more info: https://www.npmjs.com/package/express-session#resave
+//   })
+// );
 app.get("/", (req, res) => {
   res.send("hello world");
 });
